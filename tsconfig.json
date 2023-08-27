@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "sourceMap": true,
+    "rootDir": "src",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
