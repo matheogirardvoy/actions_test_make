@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 
-const run = async () => {
+async function run() {
     try {
         const octokit = github.getOctokit(core.getInput('token'));
         // Get repository name and owner
@@ -17,6 +17,6 @@ const run = async () => {
     } catch (error) {
         core.setFailed(error.message);
     }
-};
+}
 
-await run();
+run();
