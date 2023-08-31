@@ -9,14 +9,13 @@ async function run() {
         const owner = github.context.payload.repository.owner.login;
         const repository = github.context.payload.repository.name;
         // Get content of the README.md file
-        const {data} = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+        const {data} = await octokit.request('GET /repos/{owner}/{repo}/zipball/{ref}', {
             request: {
                 parseSuccessResponseBody: false
             },
             owner,
             repo: repository,
-            ref: 'main',
-            path: ''
+            ref: github.context.payload.ref
         });
         console.log(data);
         // fs.writeFileSync("files.zip", (<string>data), {encoding: "utf-8"});
