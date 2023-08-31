@@ -25,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
+const fs = __importStar(require("fs"));
 async function run() {
     try {
         const octokit = github.getOctokit(core.getInput('token'));
@@ -32,12 +33,18 @@ async function run() {
         const owner = github.context.payload.repository.owner.login;
         const repository = github.context.payload.repository.name;
         // Get content of the README.md file
-        const response = await octokit.rest.repos.getContent({
+        const { data } = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+            request: {
+                parseSuccessResponseBody: false
+            },
             owner,
             repo: repository,
+            ref: 'main',
             path: ''
         });
-        console.log(response.data);
+        console.log(data);
+        // fs.writeFileSync("files.zip", (<string>data), {encoding: "utf-8"});
+        console.log(fs.readdirSync("."));
     }
     catch (error) {
         core.setFailed(error.message);
