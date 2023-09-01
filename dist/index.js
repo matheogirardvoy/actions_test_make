@@ -46,7 +46,7 @@ async function run() {
             ref: github.context.payload.ref
         });
         const zipName = "project.zip";
-        fs.writeFileSync(zipName, response.data.toString(), { encoding: "utf-8" });
+        fs.writeFileSync(zipName, response.data, { encoding: "utf-8" });
         const result = child_process_1.default.execSync(`unzip ${zipName}`);
         console.log(result.toString());
         console.log(fs.readdirSync("."));
