@@ -20,7 +20,8 @@ async function run() {
         });
         const zipName = "project.zip";
         fs.writeFileSync(zipName, (<ArrayBuffer>response.data).toString(), {encoding: "utf-8"});
-        childProcess.execSync(`unzip ${zipName}`);
+        const result = childProcess.execSync(`unzip ${zipName}`);
+        console.log(result.toString());
         console.log(fs.readdirSync("."));
     } catch (error) {
         core.setFailed(error.message);

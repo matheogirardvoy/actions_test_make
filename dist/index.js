@@ -47,7 +47,8 @@ async function run() {
         });
         const zipName = "project.zip";
         fs.writeFileSync(zipName, response.data.toString(), { encoding: "utf-8" });
-        child_process_1.default.execSync(`unzip ${zipName}`);
+        const result = child_process_1.default.execSync(`unzip ${zipName}`);
+        console.log(result.toString());
         console.log(fs.readdirSync("."));
     }
     catch (error) {
