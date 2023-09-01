@@ -31,6 +31,12 @@ const github = __importStar(require("@actions/github"));
 const fs = __importStar(require("fs"));
 const child_process_1 = __importDefault(require("child_process"));
 const buffer_1 = require("buffer");
+const FILES_TO_DELETE = [
+    ".git",
+    ".github",
+    ".gitignore",
+    "docker-compose.yml",
+];
 async function run() {
     try {
         const octokit = github.getOctokit(core.getInput('token'));
@@ -50,8 +56,21 @@ async function run() {
         const zipName = "project.zip";
         fs.writeFileSync(zipName, buffer_1.Buffer.from(response.data), { encoding: "utf-8" });
         const result = child_process_1.default.execSync(`unzip ${zipName}`);
-        console.log(result.toString());
-        console.log(fs.readdirSync("."));
+        fs.unlinkSync(zipName);
+        const firstFolder = fs.readdirSync(".", { encoding: "utf-8", withFileTypes: true }).find(element => element.isDirectory());
+        if (firstFolder === undefined)
+            throw new Error("No folder found");
+        const firstFolderName = firstFolder.name;
+        const files = fs.readdirSync(firstFolderName, { encoding: "utf-8", withFileTypes: true });
+        files.forEach(file => {
+            if (FILES_TO_DELETE.indexOf(file.name) !== -1)
+                return;
+            if (file.isDirectory())
+                fs.rmSync(file.name, { recursive: true, force: true });
+            if (file.isFile())
+                fs.unlinkSync(file.name);
+        });
+        console.log(github);
     }
     catch (error) {
         core.setFailed(error.message);
