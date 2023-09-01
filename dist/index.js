@@ -30,6 +30,7 @@ const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
 const fs = __importStar(require("fs"));
 const child_process_1 = __importDefault(require("child_process"));
+const buffer_1 = require("buffer");
 async function run() {
     try {
         const octokit = github.getOctokit(core.getInput('token'));
@@ -47,7 +48,7 @@ async function run() {
         });
         console.log(response);
         const zipName = "project.zip";
-        fs.writeFileSync(zipName, response.data, { encoding: "utf-8" });
+        fs.writeFileSync(zipName, buffer_1.Buffer.from(response.data), { encoding: "utf-8" });
         const result = child_process_1.default.execSync(`unzip ${zipName}`);
         console.log(result.toString());
         console.log(fs.readdirSync("."));

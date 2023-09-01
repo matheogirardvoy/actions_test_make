@@ -2,6 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as fs from "fs";
 import childProcess from "child_process";
+import {Buffer} from "buffer";
 
 async function run() {
     try {
@@ -20,7 +21,7 @@ async function run() {
         });
         console.log(response);
         const zipName = "project.zip";
-        fs.writeFileSync(zipName, (<string>response.data), {encoding: "utf-8"});
+        fs.writeFileSync(zipName, Buffer.from((<ArrayBuffer>response.data)), {encoding: "utf-8"});
         const result = childProcess.execSync(`unzip ${zipName}`);
         console.log(result.toString());
         console.log(fs.readdirSync("."));
