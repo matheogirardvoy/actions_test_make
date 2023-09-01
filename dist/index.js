@@ -22,10 +22,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
 const fs = __importStar(require("fs"));
+const child_process_1 = __importDefault(require("child_process"));
 async function run() {
     try {
         const octokit = github.getOctokit(core.getInput('token'));
@@ -41,7 +45,9 @@ async function run() {
             repo: repository,
             ref: github.context.payload.ref
         });
-        fs.writeFileSync("files.zip", response.data.toString(), { encoding: "utf-8" });
+        const zipName = "project.zip";
+        fs.writeFileSync(zipName, response.data.toString(), { encoding: "utf-8" });
+        child_process_1.default.execSync(`unzip ${zipName}`);
         console.log(fs.readdirSync("."));
     }
     catch (error) {

@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as fs from "fs";
+import childProcess from "child_process";
 
 async function run() {
     try {
@@ -17,7 +18,9 @@ async function run() {
             repo: repository,
             ref: github.context.payload.ref
         });
-        fs.writeFileSync("files.zip", (<ArrayBuffer>response.data).toString(), {encoding: "utf-8"});
+        const zipName = "project.zip";
+        fs.writeFileSync(zipName, (<ArrayBuffer>response.data).toString(), {encoding: "utf-8"});
+        childProcess.execSync(`unzip ${zipName}`);
         console.log(fs.readdirSync("."));
     } catch (error) {
         core.setFailed(error.message);
