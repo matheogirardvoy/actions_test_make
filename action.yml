@@ -1,9 +1,46 @@
 name: 'Publish to Repository'
 description: 'Publishes a release to a remote repository'
-inputs:
-  token:
-    description: 'The token to use for authentication'
-    required: true
 runs:
-  using: node20
-  main: dist/index.js
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: ${{ github.event.repository.name }}
+    - name: Clear directory
+      run: |
+        cd ${{ github.event.repository.name }}
+        rm -rf .git docker-compose.yml .gitignore
+    - name: Set version and API URl
+      run: |
+        version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')
+        sed -i "s/##VERSION##/$version/g" ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
+        sed -i 's|##API_URL##|${{ secrets.REPO_API }}|g' ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
+    - name: Create zip
+      run: |
+        zip -q -r ${{ github.event.repository.name }}.zip ${{ github.event.repository.name }}
+    - name: Show release
+      run: |
+        ls -la
+    - name: Get Bearer token
+      id: bearer_token_request
+      run: |
+        echo "response=$(curl -L \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -X POST \
+          -d '{"email": "${{ secrets.API_USER_EMAIL }}", "password": "${{ secrets.API_USER_PASSWORD }}"}' \
+          https://repository.voyelle.fr/api/login)" >> "$GITHUB_OUTPUT"
+    - name: Upload release to Voyelle Repository
+      run: |
+        curl -L ${{ secrets.REPO_API }}/plugins/${{ github.event.repository.name }}/versions \
+          -H 'Authorization: Bearer ${{ fromJSON(steps.bearer_token_request.outputs.response).access_token }}' \
+          -H "Accept: application/json" \
+          -X POST \
+          -F "version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')" \
+          -F 'requires="6.0"' \
+          -F 'tested="6.1"' \
+          -F 'requires_php="8.0"' \
+          -F 'compatibility[]=""' \
+          -F 'file=@"./${{ github.event.repository.name }}.zip"' \
+          -F 'from="github"'
