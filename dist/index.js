@@ -52,7 +52,6 @@ async function run() {
             repo: repository,
             ref: github.context.payload.ref
         });
-        console.log(response);
         const zipName = "project.zip";
         fs.writeFileSync(zipName, buffer_1.Buffer.from(response.data), { encoding: "utf-8" });
         const result = child_process_1.default.execSync(`unzip ${zipName}`);
@@ -63,12 +62,11 @@ async function run() {
         const firstFolderName = firstFolder.name;
         const files = fs.readdirSync(firstFolderName, { encoding: "utf-8", withFileTypes: true });
         files.forEach(file => {
+            console.log(file);
             if (FILES_TO_DELETE.indexOf(file.name) !== -1)
                 return;
-            if (file.isDirectory())
-                fs.rmSync(file.name, { recursive: true, force: true });
-            if (file.isFile())
-                fs.unlinkSync(file.name);
+            // if (file.isDirectory()) fs.rmSync(file.name, {recursive: true, force: true});
+            // if (file.isFile()) fs.unlinkSync(file.name);
         });
         console.log(github);
     }
