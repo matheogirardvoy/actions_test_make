@@ -13,7 +13,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: voyellefr/action_deploy@master
+      - uses: voyellefr/action_deploy@v1
 ```
 
 Ainsi, toutes les releases publiées déclencheront le déploiement du plugin sur le repository Voyelle.
