@@ -17,3 +17,6 @@ jobs:
 ```
 
 Ainsi, toutes les releases publiées déclencheront le déploiement du plugin sur le repository Voyelle.
+
+### Mise à jour de l'action
+https://github.com/actions/toolkit/blob/main/docs/action-versioning.md
