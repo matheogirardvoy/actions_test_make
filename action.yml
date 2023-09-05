@@ -27,7 +27,7 @@ runs:
       run: |
         version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')
         sed -i "s/##VERSION##/$version/g" ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
-        sed -i 's|##API_URL##|${{ secrets.REPO_API }}|g' ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
+        sed -i 's|##API_URL##|${{ inputs.repo_api }}|g' ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
     - name: Create zip
       shell: bash
       run: |
@@ -40,12 +40,12 @@ runs:
           -H "Accept: application/json" \
           -H "Content-Type: application/json" \
           -X POST \
-          -d '{"email": "${{ secrets.API_USER_EMAIL }}", "password": "${{ secrets.API_USER_PASSWORD }}"}' \
+          -d '{"email": "${{ inputs.api_user_email }}", "password": "${{ inputs.api_user_password }}"}' \
           https://repository.voyelle.fr/api/login)" >> "$GITHUB_OUTPUT"
     - name: Upload release to Voyelle Repository
       shell: bash
       run: |
-        curl -L ${{ secrets.REPO_API }}/plugins/${{ github.event.repository.name }}/versions \
+        curl -L ${{ inputs.repo_api }}/plugins/${{ github.event.repository.name }}/versions \
           -H 'Authorization: Bearer ${{ fromJSON(steps.bearer_token_request.outputs.response).access_token }}' \
           -H "Accept: application/json" \
           -X POST \
