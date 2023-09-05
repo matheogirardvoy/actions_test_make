@@ -18,7 +18,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: voyellefr/action_deploy@v1
+      - name: Deploy
+        uses: voyellefr/action_deploy@v1
         with:
           api_repo: ${{ secrets.API_REPO }}
           api_user_email: ${{ secrets.API_USER_EMAIL }}
