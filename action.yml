@@ -1,7 +1,7 @@
 name: 'Publish to Repository'
 description: 'Publishes a release to a remote repository'
 inputs:
-  repo_api:
+  api_repo:
     description: 'The API URL of the repository'
     required: true
   api_user_email:
@@ -27,7 +27,7 @@ runs:
       run: |
         version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')
         sed -i "s/##VERSION##/$version/g" ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
-        sed -i 's|##API_URL##|${{ inputs.repo_api }}|g' ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
+        sed -i 's|##API_URL##|${{ inputs.api_repo }}|g' ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
     - name: Create zip
       shell: bash
       run: |
@@ -45,7 +45,7 @@ runs:
     - name: Upload release to Voyelle Repository
       shell: bash
       run: |
-        curl -L ${{ inputs.repo_api }}/plugins/${{ github.event.repository.name }}/versions \
+        curl -L ${{ inputs.api_repo }}/plugins/${{ github.event.repository.name }}/versions \
           -H 'Authorization: Bearer ${{ fromJSON(steps.bearer_token_request.outputs.response).access_token }}' \
           -H "Accept: application/json" \
           -X POST \
