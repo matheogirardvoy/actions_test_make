@@ -55,5 +55,5 @@ runs:
           -F 'requires_php="8.0"' \
           -F 'compatibility[]=""' \
           -F 'file=@"./${{ github.event.repository.name }}.zip"' \
-          -F 'from="github"'
+          -F 'from="github"' \
           --no-progress-meter
