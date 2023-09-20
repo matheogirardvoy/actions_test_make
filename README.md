@@ -2,8 +2,10 @@
 
 ## Usage
 
-Créer les secrets suivants dans le projet GitHub : 
+Créer les secrets suivants dans le projet GitHub :
+- `PLUGIN_SLUG` : Slug du plugin à déployer
 - `API_REPO` : URL du Repository Voyelle
+- `API_REPO_LOGIN_URL` : URL de login du Repository Voyelle
 - `API_USER_EMAIL` : Email de l'utilisateur Repository
 - `API_USER_PASSWORD` : Mot de passe de l'utilisateur Repository
 
@@ -21,7 +23,9 @@ jobs:
       - name: Deploy
         uses: voyellefr/action_deploy@v1
         with:
+          plugin_slug: ${{ secrets.PLUGIN_SLUG }}
           api_repo: ${{ secrets.API_REPO }}
+          api_repo_login_url: ${{ secrets.API_REPO_LOGIN_URL }}
           api_user_email: ${{ secrets.API_USER_EMAIL }}
           api_user_password: ${{ secrets.API_USER_PASSWORD }}
 ```

@@ -7,8 +7,8 @@ inputs:
   api_repo:
     description: 'The API URL of the repository'
     required: true
-  api_repo_login:
-    description: 'The login of the user to authenticate with'
+  api_repo_login_url:
+    description: 'The API URL of the login endpoint'
     required: true
   api_user_email:
     description: 'The email of the user to authenticate with'
