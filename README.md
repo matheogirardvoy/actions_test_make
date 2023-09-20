@@ -30,3 +30,9 @@ Ainsi, toutes les releases publiées déclencheront le déploiement du plugin su
 
 ### Mise à jour de l'action
 https://github.com/actions/toolkit/blob/main/docs/action-versioning.md
+
+### Push le tag
+```bash
+git tag -fa <tag> -m "Tag message"
+git push origin <tag> --force
+```
