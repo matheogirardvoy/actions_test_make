@@ -1,8 +1,14 @@
 name: 'Publish to Repository'
 description: 'Publishes a release to a remote repository'
 inputs:
+  plugin_slug:
+    description: 'The slug of the plugin'
+    required: true
   api_repo:
     description: 'The API URL of the repository'
+    required: true
+  api_repo_login:
+    description: 'The login of the user to authenticate with'
     required: true
   api_user_email:
     description: 'The email of the user to authenticate with'
@@ -16,7 +22,7 @@ runs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        path: ${{ github.event.repository.name }}
+        path: ${{ inputs.plugin_slug }}
     - name: Clear directory
       shell: bash
       run: |
@@ -26,12 +32,12 @@ runs:
       shell: bash
       run: |
         version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')
-        sed -i "s/##VERSION##/$version/g" ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
-        sed -i 's|##API_URL##|${{ inputs.api_repo }}|g' ${{ github.event.repository.name }}/${{ github.event.repository.name }}.php
+        sed -i "s/##VERSION##/$version/g" ${{ inputs.plugin_slug }}/${{ inputs.plugin_slug }}.php
+        sed -i 's|##API_URL##|${{ inputs.api_repo }}|g' ${{ inputs.plugin_slug }}/${{ inputs.plugin_slug }}.php
     - name: Create zip
       shell: bash
       run: |
-        zip -q -r ${{ github.event.repository.name }}.zip ${{ github.event.repository.name }}
+        zip -q -r ${{ inputs.plugin_slug }}.zip ${{ inputs.plugin_slug }}
     - name: Get Bearer token
       id: bearer_token_request
       shell: bash
@@ -41,11 +47,11 @@ runs:
           -H "Content-Type: application/json" \
           -X POST \
           -d '{"email": "${{ inputs.api_user_email }}", "password": "${{ inputs.api_user_password }}"}' \
-          https://repository.voyelle.fr/api/login --no-progress-meter)" >> "$GITHUB_OUTPUT"
+          ${{ inputs.api_repo_login }} --no-progress-meter)" >> "$GITHUB_OUTPUT"
     - name: Upload release to Voyelle Repository
       shell: bash
       run: |
-        curl -L ${{ inputs.api_repo }}/plugins/${{ github.event.repository.name }}/versions \
+        curl -L ${{ inputs.api_repo }}/plugins/${{ inputs.plugin_slug }}/versions \
           -H 'Authorization: Bearer ${{ fromJSON(steps.bearer_token_request.outputs.response).access_token }}' \
           -H "Accept: application/json" \
           -X POST \
@@ -54,6 +60,6 @@ runs:
           -F 'tested="6.1"' \
           -F 'requires_php="8.0"' \
           -F 'compatibility[]=""' \
-          -F 'file=@"./${{ github.event.repository.name }}.zip"' \
+          -F 'file=@"./${{ inputs.plugin_slug }}.zip"' \
           -F 'from="github"' \
           --no-progress-meter
