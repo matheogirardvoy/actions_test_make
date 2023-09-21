@@ -47,7 +47,7 @@ runs:
           -H "Content-Type: application/json" \
           -X POST \
           -d '{"email": "${{ inputs.api_user_email }}", "password": "${{ inputs.api_user_password }}"}' \
-          ${{ inputs.api_repo_login }} --no-progress-meter)" >> "$GITHUB_OUTPUT"
+          ${{ inputs.api_repo_login_url }} --no-progress-meter)" >> "$GITHUB_OUTPUT"
     - name: Upload release to Voyelle Repository
       shell: bash
       run: |
