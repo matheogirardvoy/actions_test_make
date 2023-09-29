@@ -32,8 +32,24 @@ runs:
       shell: bash
       run: |
         version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')
-        sed -i "s/##VERSION##/$version/g" ${{ inputs.plugin_slug }}/${{ inputs.plugin_slug }}.php
-        sed -i 's|##API_URL##|${{ inputs.api_repo }}|g' ${{ inputs.plugin_slug }}/${{ inputs.plugin_slug }}.php
+        cd ${{ inputs.plugin_slug }}
+        sed -i "s/##VERSION##/$version/g" ${{ inputs.plugin_slug }}.php
+        sed -i 's|##API_URL##|${{ inputs.api_repo }}|g' ${{ inputs.plugin_slug }}.php
+    - uses: "shivammathur/setup-php@v2"
+      with:
+        php-version: "latest"
+    - uses: "ramsey/composer-install@v2"
+      with:
+        composer-options: "--no-dev --no-progress --no-interaction"
+        working-directory: ${{ inputs.plugin_slug }}
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Install dependencies
+      shell: bash
+      run: |
+        cd ${{ inputs.plugin_slug }}
+        npm install --omit=dev --no-progress
     - name: Create zip
       shell: bash
       run: |
