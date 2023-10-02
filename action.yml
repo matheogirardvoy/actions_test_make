@@ -38,8 +38,9 @@ runs:
     - name: Create missing files
       shell: bash
       run: |
-        [ -e "${{ inputs.plugin_slug }}/composer.json" ] || composer init -q -n --name voyelle/${{ inputs.plugin_slug }} --type wordpress-plugin --require php:^8.0
-        [ -e "${{ inputs.plugin_slug }}/package.json" ] || npm init -y
+        cd ${{ inputs.plugin_slug }}
+        [ -e "composer.json" ] || composer init -q -n --name voyelle/${{ inputs.plugin_slug }} --type wordpress-plugin --require php:^8.0
+        [ -e "package.json" ] || npm init -y
     - uses: "shivammathur/setup-php@v2"
       with:
         php-version: "latest"
