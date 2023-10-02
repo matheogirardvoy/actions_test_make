@@ -35,6 +35,11 @@ runs:
         cd ${{ inputs.plugin_slug }}
         sed -i "s/##VERSION##/$version/g" ${{ inputs.plugin_slug }}.php
         sed -i 's|##API_URL##|${{ inputs.api_repo }}|g' ${{ inputs.plugin_slug }}.php
+    - name: Create missing files
+      shell: bash
+      run: |
+        [ ! -e ${{ inputs.plugin_slug }}/composer.json ] composer init -q -n --name voyelle/${{ inputs.plugin_slug }} --type wordpress-plugin --require php:^8.0
+        [ ! -e ${{ inputs.plugin_slug }}/package.json ] npm init -y
     - uses: "shivammathur/setup-php@v2"
       with:
         php-version: "latest"
