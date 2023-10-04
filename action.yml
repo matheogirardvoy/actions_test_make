@@ -26,7 +26,7 @@ runs:
     - name: Clear directory
       shell: bash
       run: |
-        cd ${{ github.event.repository.name }}
+        cd ${{ inputs.plugin_slug }}
         rm -rf .git docker-compose.yml .gitignore
     - name: Set version and API URl
       shell: bash
