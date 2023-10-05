@@ -17,71 +17,72 @@ inputs:
     description: 'The password of the user to authenticate with'
     required: true
 runs:
-  using: "composite"
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        path: ${{ inputs.plugin_slug }}
-    - name: Clear directory
-      shell: bash
-      run: |
-        cd ${{ inputs.plugin_slug }}
-        rm -rf .git docker-compose.yml .gitignore
-    - name: Set version and API URl
-      shell: bash
-      run: |
-        version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')
-        cd ${{ inputs.plugin_slug }}
-        sed -i "s/##VERSION##/$version/g" ${{ inputs.plugin_slug }}.php
-        sed -i 's|##API_URL##|${{ inputs.api_repo }}|g' ${{ inputs.plugin_slug }}.php
-    - name: Create missing files
-      shell: bash
-      run: |
-        cd ${{ inputs.plugin_slug }}
-        [ -e "composer.json" ] || composer init -q -n --name voyelle/${{ inputs.plugin_slug }} --type wordpress-plugin --require php:^8.0
-        [ -e "package.json" ] || npm init -y
-    - uses: "shivammathur/setup-php@v2"
-      with:
-        php-version: "latest"
-    - uses: "ramsey/composer-install@v2"
-      with:
-        composer-options: "--no-dev --no-progress --no-interaction"
-        working-directory: ${{ inputs.plugin_slug }}
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
-    - name: Install dependencies
-      shell: bash
-      run: |
-        cd ${{ inputs.plugin_slug }}
-        npm install --omit=dev --no-progress
-    - name: Create zip
-      shell: bash
-      run: |
-        zip -q -r ${{ inputs.plugin_slug }}.zip ${{ inputs.plugin_slug }}
-    - name: Get Bearer token
-      id: bearer_token_request
-      shell: bash
-      run: |
-        echo "response=$(curl -L \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -X POST \
-          -d '{"email": "${{ inputs.api_user_email }}", "password": "${{ inputs.api_user_password }}"}' \
-          ${{ inputs.api_repo_login_url }} --no-progress-meter)" >> "$GITHUB_OUTPUT"
-    - name: Upload release to Voyelle Repository
-      shell: bash
-      run: |
-        curl -L ${{ inputs.api_repo }}/plugins/${{ inputs.plugin_slug }}/versions \
-          -H 'Authorization: Bearer ${{ fromJSON(steps.bearer_token_request.outputs.response).access_token }}' \
-          -H "Accept: application/json" \
-          -X POST \
-          -F "version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')" \
-          -F 'requires="6.0"' \
-          -F 'tested="6.1"' \
-          -F 'requires_php="8.0"' \
-          -F 'compatibility[]=""' \
-          -F 'file=@"./${{ inputs.plugin_slug }}.zip"' \
-          -F 'from="github"' \
-          --no-progress-meter
+  using: "node20"
+  main: "index.js"
+#  steps:
+#    - name: Checkout
+#      uses: actions/checkout@v3
+#      with:
+#        path: ${{ inputs.plugin_slug }}
+#    - name: Clear directory
+#      shell: bash
+#      run: |
+#        cd ${{ inputs.plugin_slug }}
+#        rm -rf .git docker-compose.yml .gitignore
+#    - name: Set version and API URl
+#      shell: bash
+#      run: |
+#        version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')
+#        cd ${{ inputs.plugin_slug }}
+#        sed -i "s/##VERSION##/$version/g" ${{ inputs.plugin_slug }}.php
+#        sed -i 's|##API_URL##|${{ inputs.api_repo }}|g' ${{ inputs.plugin_slug }}.php
+#    - name: Create missing files
+#      shell: bash
+#      run: |
+#        cd ${{ inputs.plugin_slug }}
+#        [ -e "composer.json" ] || composer init -q -n --name voyelle/${{ inputs.plugin_slug }} --type wordpress-plugin --require php:^8.0
+#        [ -e "package.json" ] || npm init -y
+#    - uses: "shivammathur/setup-php@v2"
+#      with:
+#        php-version: "latest"
+#    - uses: "ramsey/composer-install@v2"
+#      with:
+#        composer-options: "--no-dev --no-progress --no-interaction"
+#        working-directory: ${{ inputs.plugin_slug }}
+#    - uses: actions/setup-node@v3
+#      with:
+#        node-version: 18
+#    - name: Install dependencies
+#      shell: bash
+#      run: |
+#        cd ${{ inputs.plugin_slug }}
+#        npm install --omit=dev --no-progress
+#    - name: Create zip
+#      shell: bash
+#      run: |
+#        zip -q -r ${{ inputs.plugin_slug }}.zip ${{ inputs.plugin_slug }}
+#    - name: Get Bearer token
+#      id: bearer_token_request
+#      shell: bash
+#      run: |
+#        echo "response=$(curl -L \
+#          -H "Accept: application/json" \
+#          -H "Content-Type: application/json" \
+#          -X POST \
+#          -d '{"email": "${{ inputs.api_user_email }}", "password": "${{ inputs.api_user_password }}"}' \
+#          ${{ inputs.api_repo_login_url }} --no-progress-meter)" >> "$GITHUB_OUTPUT"
+#    - name: Upload release to Voyelle Repository
+#      shell: bash
+#      run: |
+#        curl -L ${{ inputs.api_repo }}/plugins/${{ inputs.plugin_slug }}/versions \
+#          -H 'Authorization: Bearer ${{ fromJSON(steps.bearer_token_request.outputs.response).access_token }}' \
+#          -H "Accept: application/json" \
+#          -X POST \
+#          -F "version=$(echo ${{ github.event.release.tag_name }} | sed 's/v//')" \
+#          -F 'requires="6.0"' \
+#          -F 'tested="6.1"' \
+#          -F 'requires_php="8.0"' \
+#          -F 'compatibility[]=""' \
+#          -F 'file=@"./${{ inputs.plugin_slug }}.zip"' \
+#          -F 'from="github"' \
+#          --no-progress-meter
